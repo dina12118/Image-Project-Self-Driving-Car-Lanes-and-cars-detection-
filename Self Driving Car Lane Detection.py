@@ -78,7 +78,7 @@ def abs_sobel_thresh(img, axes = 'x', kernel = 3, thresh = (0, 255)):
     # Create binary mask
     grad_binary = np.zeros_like(scaled_sobel)
     # Combine the mask with the x or y gradient (apply threshold)
-    grad_binary[(scaled_sobel >= grad_thresh[0]) & (scaled_sobel <= grad_thresh[1])] = 1
+    grad_binary[(scaled_sobel >= thresh[0]) & (scaled_sobel <= thresh[1])] = 1
  
     return grad_binary
 
@@ -111,7 +111,7 @@ def dir_sobel_threshold(img, kernel = 3, thresh = (0, np.pi/2)):
     # Take the absolute value
     abs_dir = np.arctan2(np.absolute(sobely), np.absolute(sobelx))
     # Create binary mask
-    dir_binary =  np.zeros_like(abs_grad_dir)
+    dir_binary =  np.zeros_like(abs_dir)
     # Combine the mask with the absolute direction value (apply threshold)
     dir_binary[(abs_dir >= thresh[0]) & (abs_dir <= thresh[1])] = 1
     return dir_binary
@@ -162,17 +162,15 @@ def combined_color_channels_threshod(img, r_thresh=(225,255), l_thresh=(215,255)
 
 
 def combined_grad_color_threshold(img,grad_kernel = 3, gradx_thresh = (20,100), grady_thresh = (50,100),mag_kernel = 5, mag_thresh = (50,100),dir_kernel = 9, dir_thresh = (0.7,1.3)):
-
-    color_binary = combined_color_channels_threshod(img)
     
     gray_img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
     # Apply sobel edge detection in x and y directions
-    gradx = abs_sobel_thresh(gray_img, 'x', grad_kernel, gradx_thresh)
-    grady = abs_sobel_thresh(gray_img, 'y', grad_kernel, grady_thresh)
+    gradx = abs_sobel_thresh(img, 'x', grad_kernel, gradx_thresh)
+    grady = abs_sobel_thresh(img, 'y', grad_kernel, grady_thresh)
     # get mag_sobel_threshold
-    mag_binary = mag_sobel_threshold(gray_img, mag_kernel, mag_thresh)
+    mag_binary = mag_sobel_threshold(img, mag_kernel, mag_thresh)
     # get dir_sobel_threshold
-    dir_binary = dir_sobel_threshold(gray_img, dir_kernel, dir_thresh)
+    dir_binary = dir_sobel_threshold(img, dir_kernel, dir_thresh)
     # Combined color channels and gradient in y and x and it directions and magnitudes (apply threshold)
     combined_binary = np.zeros_like(color_binary)
     combined_binary[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1)) | (color_binary == 1)] = 1
