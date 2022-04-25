@@ -222,15 +222,16 @@ def get_histogram(img):
     
     return histogram
 
-def get_histogram_peaks(img,M):
+def get_histogram_peaks(img):
 
-    warped = get_binary_warped(img, M)
-    histogram_of_warped = get_histogram(warped)
+    histogram_of_img = get_histogram(img)
     # Find the peak of the left and right halves of the histogram
     # These will be the starting point for the left and right lines
-    midpoint = np.int(histogram_of_warped.shape[0]//2)
-    leftx_base = np.argmax(histogram_of_warped[:midpoint])
+    midpoint = np.int(histogram_of_img.shape[0]//2)
+    leftx_base = np.argmax(histogram_of_img[:midpoint])
     # np.argmax() Returns the indices of the maximum values along an axis.
-    rightx_base = np.argmax(histogram_of_warped[midpoint:]) + midpoint
+    rightx_base = np.argmax(histogram_of_img[midpoint:]) + midpoint
     
     return leftx_base, rightx_base
+
+# Apply Sliding Window Algorithm:
