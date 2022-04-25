@@ -203,3 +203,13 @@ def combined_canny_grad_color_threshold(img):
     combined_binary[ (canny_edged == 1) | (color_grad_binary == 1)] = 1
     
     return combined_binary
+
+
+# Apply warp Perspective to the binary image after process it
+def get_binary_warped(img, M):
+
+    combined_img = combined_canny_grad_color_threshold(img)   
+    # Apply transformation
+    warped = warp_image(combined_img, M)
+
+    return warped
