@@ -1,11 +1,8 @@
 #import useful libraries
 import glob
 import cv2
-import pickle
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import numpy as np
-import ipywidgets as widgets
 %matplotlib inline
 
 #upload test photo
