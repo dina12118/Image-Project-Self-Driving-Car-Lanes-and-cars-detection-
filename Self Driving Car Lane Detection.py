@@ -221,3 +221,16 @@ def get_histogram(img):
     histogram = np.sum(bottom_half, axis=0)
     
     return histogram
+
+def get_histogram_peaks(img,M):
+
+    warped = get_binary_warped(img, M)
+    histogram_of_warped = get_histogram(warped)
+    # Find the peak of the left and right halves of the histogram
+    # These will be the starting point for the left and right lines
+    midpoint = np.int(histogram_of_warped.shape[0]//2)
+    leftx_base = np.argmax(histogram_of_warped[:midpoint])
+    # np.argmax() Returns the indices of the maximum values along an axis.
+    rightx_base = np.argmax(histogram_of_warped[midpoint:]) + midpoint
+    
+    return leftx_base, rightx_base
