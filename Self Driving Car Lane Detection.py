@@ -235,3 +235,160 @@ def get_histogram_peaks(img):
     return leftx_base, rightx_base
 
 # Apply Sliding Window Algorithm:
+def f1(warped, no_of_windows = 10, margin = 100, minpix = 20):
+
+    leftx_base, rightx_base = get_histogram_peaks(warped)   
+    window_height = np.int(warped.shape[0]//no_of_windows)#1280//10 = 128
+    # nonzero() Returns a tuple of arrays, for x and y, containing the indices of the non-zero elements
+    non_zero = warped.nonzero()
+    non_zero_y = np.array(non_zero[0])
+    non_zero_x = np.array(non_zero[1])
+    
+    # Start with the returned indicies of the histogram and will be updated later
+    leftx_current = leftx_base
+    rightx_current = rightx_base
+    
+    # Create empty lists to receive left and right lane pixel indices
+    left_lane_inds = []
+    right_lane_inds = []
+    right_windows = []
+    left_windows = []
+    
+    # Step through the windows one by one
+    for window in range(no_of_windows):
+        # Identify window boundaries in x and y (and right and left)
+        W_lower_limit_y = warped.shape[0] - (window + 1) * window_height# 592
+        W_higher_limit_y = warped.shape[0] - window * window_height#720
+        W_xleft_low = leftx_current - margin#315 - 100 = 215
+        W_xleft_high = leftx_current + margin#315 + 100 = 415
+        W_xright_low = rightx_current - margin#958 -100 = 858
+        W_xright_high = rightx_current + margin#958+100=1058
+        
+        
+        # Append windows corners used during the sliding (to visualizaton rectanguler windows)
+        # The append() method appends an element to the end of the list.
+        left_windows.append(((W_xleft_low, W_lower_limit_y), (W_xleft_high, W_higher_limit_y)))
+        
+        
+        right_windows.append(((W_xright_low, W_lower_limit_y), (W_xright_high, W_higher_limit_y)))
+        
+        # Identify the nonzero pixels in x and y within the window 
+        good_left_inds = ((non_zero_y >= W_lower_limit_y) & (non_zero_y < W_higher_limit_y) &                          
+                          (non_zero_x >= W_xleft_low) &  (non_zero_x < W_xleft_high)).nonzero()[0]
+        good_right_inds = ((non_zero_y >= W_lower_limit_y) & (non_zero_y < W_higher_limit_y) & 
+                           (non_zero_x >= W_xright_low) &  (non_zero_x < W_xright_high)).nonzero()[0]
+        
+        # Append these indices to the lists
+        left_lane_inds.append(good_left_inds)
+        right_lane_inds.append(good_right_inds)
+        
+        # If there is number of nonzeros pixels > minpix, recenter next window on their mean position
+        if len(good_left_inds) > minpix:
+            leftx_current = np.int(np.mean(non_zero_x[good_left_inds]))
+        if len(good_right_inds) > minpix:        
+            rightx_current = np.int(np.mean(non_zero_x[good_right_inds]))
+            
+                # Concatenate the arrays of indices (previously was a list of lists of pixels)
+    try:
+        left_lane_inds = np.concatenate(left_lane_inds)
+        right_lane_inds = np.concatenate(right_lane_inds)
+    except ValueError:
+        # Avoids an error if the above is not implemented fully
+        pass
+    
+        # Extract left and right line pixel positions
+    leftx = non_zero_x[left_lane_inds]
+    lefty = non_zero_y[left_lane_inds] 
+    rightx = non_zero_x[right_lane_inds]
+    righty = non_zero_y[right_lane_inds]
+
+
+    return leftx, lefty, rightx, righty
+
+def f2(warped,leftx, lefty, rightx, righty):
+    ploty = np.linspace(0, warped.shape[0]-1, warped.shape[0] )#0,1,2,......,719
+    
+    # np.polyfit Returns a vector of coefficients p that minimises the squared error in the order deg, deg-1, … 0.
+    left_fit = np.polyfit(lefty, leftx, 2)#y,x,degree of poly
+    right_fit = np.polyfit(righty, rightx, 2)#y,x,degree of poly
+    left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]# x = a2 * y^2 + a1 * y + a0
+    right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
+    
+    y_eval = np.max(ploty)  # 720p video/image, so last (lowest on screen) y index is 719
+
+    ym_per_pix = 30/720 # meters per pixel in y dimension
+    xm_per_pix = 3.7/700 # meters per pixel in x dimension
+    
+    left_fit_cr = np.polyfit(lefty*ym_per_pix, leftx*xm_per_pix, 2)
+    right_fit_cr = np.polyfit(righty*ym_per_pix, rightx*xm_per_pix, 2)
+    # Calculate the new radii of curvature
+    left_curv = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])
+    right_curv = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])
+    
+    return left_fit, right_fit, left_fitx, right_fitx, left_curv, right_curv
+
+def f3(warped, left_fit, right_fit, sap_margin =70):
+
+    # Grab activated pixels
+    non_zero = warped.nonzero()
+    non_zero_y = np.array(non_zero[0])
+    non_zero_x = np.array(non_zero[1])
+    
+    # Identify the nonzero pixels in x and y within the window
+    left_lane_inds = ((non_zero_x > (left_fit[0] * (non_zero_y**2) + left_fit[1] * non_zero_y + 
+                    left_fit[2] - sap_margin)) & (non_zero_x < (left_fit[0] * (non_zero_y**2) + 
+                    left_fit[1]*non_zero_y + left_fit[2] + sap_margin)))
+    right_lane_inds = ((non_zero_x > (right_fit[0] * (non_zero_y**2) + right_fit[1] * non_zero_y + 
+                    right_fit[2] - sap_margin)) & (non_zero_x < (right_fit[0] * (non_zero_y**2) + 
+                    right_fit[1] * non_zero_y + right_fit[2] + sap_margin)))
+    
+    # Again, extract left and right line pixel positions
+    leftx_line_pos = non_zero_x[left_lane_inds]
+    lefty_line_pos = non_zero_y[left_lane_inds] 
+    rightx_line_pos = non_zero_x[right_lane_inds]
+    righty_line_pos = non_zero_y[right_lane_inds]
+    
+    return leftx_line_pos, lefty_line_pos, rightx_line_pos, righty_line_pos
+
+def f4(img, Minv, left_fitx, right_fitx):
+
+    ploty = np.linspace(0, img.shape[0]-1, img.shape[0] )
+    height, width = img.shape[:2]
+    # Prepare the image to map the lane
+    warp_black = np.zeros((height, width)).astype(np.uint8)
+    warp_color = np.dstack((warp_black, warp_black, warp_black))
+    # Calculate the left and the right x,y position of the boundaries
+    left_line = np.array([np.transpose(np.vstack([left_fitx, ploty]))])
+    right_line = np.array([np.flipud(np.transpose(np.vstack([right_fitx, ploty])))])    
+    lane = np.hstack((left_line, right_line))
+    # Draw the lane
+    cv2.fillPoly(warp_color, np.int_([lane]), (0,255, 0))
+    cv2.polylines(warp_color, np.int32([left_line]), isClosed=False, color=(0,0,255), thickness=15)
+    cv2.polylines(warp_color, np.int32([right_line]), isClosed=False, color=(0,0,255), thickness=15)
+    # Unwarp the image to be merge with the original frame
+    unWarpLane = cv2.warpPerspective(warp_color, Minv, (width, height)) 
+    # Merge the lane with the original picture
+    img_with_lane = cv2.addWeighted(img, 1, unWarpLane, 0.8, 0)
+    
+    return img_with_lane
+
+
+def f5(img, leftx_base, rightx_base ,left_curv, right_curv):
+
+    copy_img = np.copy(img)
+    h = copy_img.shape[0]
+    car_position = copy_img.shape[1]/2
+    lane_center_position = leftx_base + (rightx_base - leftx_base)/2
+    ym_per_pix = 30/720 # meters per pixel in y dimension
+    xm_per_pix = 3.7/700 # meters per pixel in x dimension
+    # can be changed
+
+    center_distance = (car_position - lane_center_position) * xm_per_pix
+    
+    font = cv2.FONT_HERSHEY_DUPLEX
+    text = 'Radius of Curvature: ' + '{:04.2f}'.format((left_curv + right_curv)/2) + ' m'
+    cv2.putText(copy_img, text, (40,70), font, 1, (255,255,255), 2, cv2.LINE_AA)
+    text = 'Position: ' + '{:04.2f}'.format(center_distance) + ' m from center of lane'
+    cv2.putText(copy_img, text, (40,120), font, 1, (255,5255,255), 2, cv2.LINE_AA)
+    
+    return copy_img
