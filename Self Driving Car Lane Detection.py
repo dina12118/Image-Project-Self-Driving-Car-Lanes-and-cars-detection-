@@ -61,6 +61,27 @@ def getSrcDstPoints(img):
     
 # Functions for improving image details:
 
+def abs_sobel_thresh(img, axes = 'x', grad_kernel = 3, grad_thresh = (0, 255)):
+    
+    # get the image in gray
+    gray_img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+    if(axes == 'x'):
+        # Apply sobel edge detection in x direction
+        sobel = cv2.Sobel(gray_img, cv2.CV_64F, 1, 0, ksize = kernel)
+    else:
+        # Apply sobel edge detection in y direction
+        sobel = cv2.Sobel(gray_img, cv2.CV_64F, 0, 1, ksize = kernel)
+    # Take the absolute value
+    abs_sobel = np.absolute(sobel)
+    # Rescale the intensities
+    scaled_sobel = (255 * abs_sobel / np.max(abs_sobel)).astype(np.uint8) 
+    # Create binary mask
+    grad_binary = np.zeros_like(scaled_sobel)
+    # Combine the mask with the x or y gradient (apply threshold)
+    grad_binary[(scaled_sobel >= grad_thresh[0]) & (scaled_sobel <= grad_thresh[1])] = 1
+ 
+    return grad_binary
+
 def mag_sobel_threshold(img , kernel = 3, thresh = (0, 255)):
     
     # get the image in gray
@@ -138,3 +159,22 @@ def combined_color_channels_threshod(img, r_thresh=(225,255), l_thresh=(215,255)
                  ((b > b_thresh[0]) & (b <= b_thresh[1])) ] = 1
     
     return color_binary   
+
+
+def combined_color_channels_threshod(img, grad_kernel = 3, gradx_thresh = (20,100), grady_thresh = (50,100), mag_kernel = 5, mag_thresh = (50,100), dir_kernel = 9, dir_thresh = (0.7,1.3)):
+
+    color_binary = combined_color_threshod(img)
+    
+    gray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+    # Apply sobel edge detection in x and y directions
+    gradx = cv2.Sobel(gray_img, cv2.CV_64F, 1, 0, ksize = kernel)
+    grady = cv2.Sobel(gray_img, cv2.CV_64F, 0, 1, ksize = kernel)
+    # Magnitude
+    mag_binary = mag_threshold(gray, mag_kernel, mag_thresh)
+    # Direction
+    dir_binary = dir_threshold(gray, dir_kernel, dir_thresh)
+    # Combined
+    combined_binary = np.zeros_like(color_binary)
+    combined_binary[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1)) | (color_binary == 1)] = 1
+    
+    return combined_binary
