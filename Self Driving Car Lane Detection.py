@@ -213,3 +213,11 @@ def get_binary_warped(img, M):
     warped = warp_image(combined_img, M)
 
     return warped
+
+# Extract a histogram (the bottom half part from our image) and some useful information from it:
+
+def get_histogram(img):
+    bottom_half = img[img.shape[0]//2:,:]
+    histogram = np.sum(bottom_half, axis=0)
+    
+    return histogram
