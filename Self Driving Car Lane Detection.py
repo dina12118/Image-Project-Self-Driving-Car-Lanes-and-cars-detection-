@@ -60,7 +60,7 @@ def getSrcDstPoints(img):
     
     
     
-def mag_sobel(gray_img , kernel = 3, thresh = (0, 255)):
+def mag_sobel_threshold(gray_img , kernel = 3, thresh = (0, 255)):
 
     # Apply sobel edge detection in x and y directions
     
