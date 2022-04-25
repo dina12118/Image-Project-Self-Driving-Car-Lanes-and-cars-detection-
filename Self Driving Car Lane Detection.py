@@ -91,7 +91,7 @@ def dir_sobel_threshold(img, kernel = 3, thresh = (0, np.pi/2)):
     abs_dir = np.arctan2(np.absolute(sobely), np.absolute(sobelx))
     # Create binary mask
     dir_binary =  np.zeros_like(abs_grad_dir)
-    # Combine the mask with the scaled magnitude (apply threshold)
+    # Combine the mask with the absolute direction value (apply threshold)
     dir_binary[(abs_dir >= thresh[0]) & (abs_dir <= thresh[1])] = 1
     return dir_binary
 
@@ -122,3 +122,19 @@ def get_lab(img):
     b = img_LAB[:,:,2]
     
     return l, a, b
+
+
+def combined_color_channels_threshod(img, r_thresh=(225,255), l_thresh=(215,255), s_thresh=(170,255), b_thresh=(180,255)):
+
+    _, l, s = get_hls(img)
+    r, _, _ = get_rgb(img)
+    _, _, b = get_lab(img)
+    # Create binary mask
+    color_binary = np.zeros_like(r)
+    # Combine the mask with the desired channels (R, S, L, B) (apply threshold)
+    color_binary[((r > r_thresh[0]) & (r <= r_thresh[1])) |
+                 ((l > l_thresh[0]) & (l <= l_thresh[1])) | 
+                 ((s > s_thresh[0]) & (s <= s_thresh[1])) |
+                 ((b > b_thresh[0]) & (b <= b_thresh[1])) ] = 1
+    
+    return color_binary   
