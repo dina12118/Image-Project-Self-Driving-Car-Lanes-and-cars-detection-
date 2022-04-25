@@ -94,3 +94,31 @@ def dir_sobel_threshold(img, kernel = 3, thresh = (0, np.pi/2)):
     # Combine the mask with the scaled magnitude (apply threshold)
     dir_binary[(abs_dir >= thresh[0]) & (abs_dir <= thresh[1])] = 1
     return dir_binary
+
+
+# Extract RGB and HLS and LAB color channels for better detection:
+
+def get_rgb(img):
+    #channel R has useful information
+    r = img[:, :, 2]
+    g = img[:, :, 1]
+    b = img[:, :, 0]    
+    return r, g, b
+
+def get_hls(img):
+    #channel l and s have useful information
+    img_HLS = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
+    h = img_HLS[:, :, 0]
+    l = img_HLS[:, :, 1]
+    s = img_HLS[:, :, 2]
+    
+    return h, l , s
+
+def get_lab(img):
+    #channel b has useful information
+    img_LAB = cv2.cvtColor(img, cv2.COLOR_BGR2Lab)
+    l = img_LAB[:,:,0]
+    a = img_LAB[:,:,1]
+    b = img_LAB[:,:,2]
+    
+    return l, a, b
