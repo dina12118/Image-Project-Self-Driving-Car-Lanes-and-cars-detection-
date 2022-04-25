@@ -61,7 +61,7 @@ def getSrcDstPoints(img):
     
 # Functions for improving image details:
 
-def abs_sobel_thresh(img, axes = 'x', grad_kernel = 3, grad_thresh = (0, 255)):
+def abs_sobel_thresh(img, axes = 'x', kernel = 3, thresh = (0, 255)):
     
     # get the image in gray
     gray_img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
@@ -105,7 +105,7 @@ def dir_sobel_threshold(img, kernel = 3, thresh = (0, np.pi/2)):
     
     # get the image in gray
     gray_img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-    # Calculate the x and y gradients
+    # Apply sobel edge detection in x and y directions
     sobelx = cv2.Sobel(gray_img, cv2.CV_64F, 1, 0, ksize = kernel)
     sobely = cv2.Sobel(gray_img, cv2.CV_64F, 0, 1, ksize = kernel)
     # Take the absolute value
@@ -161,19 +161,19 @@ def combined_color_channels_threshod(img, r_thresh=(225,255), l_thresh=(215,255)
     return color_binary   
 
 
-def combined_color_channels_threshod(img, grad_kernel = 3, gradx_thresh = (20,100), grady_thresh = (50,100), mag_kernel = 5, mag_thresh = (50,100), dir_kernel = 9, dir_thresh = (0.7,1.3)):
+def combined_grad_color_threshold(img,grad_kernel = 3, gradx_thresh = (20,100), grady_thresh = (50,100),mag_kernel = 5, mag_thresh = (50,100),dir_kernel = 9, dir_thresh = (0.7,1.3)):
 
-    color_binary = combined_color_threshod(img)
+    color_binary = combined_color_channels_threshod(img)
     
-    gray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+    gray_img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
     # Apply sobel edge detection in x and y directions
-    gradx = cv2.Sobel(gray_img, cv2.CV_64F, 1, 0, ksize = kernel)
-    grady = cv2.Sobel(gray_img, cv2.CV_64F, 0, 1, ksize = kernel)
-    # Magnitude
-    mag_binary = mag_threshold(gray, mag_kernel, mag_thresh)
-    # Direction
-    dir_binary = dir_threshold(gray, dir_kernel, dir_thresh)
-    # Combined
+    gradx = abs_sobel_thresh(gray_img, 'x', grad_kernel, gradx_thresh)
+    grady = abs_sobel_thresh(gray_img, 'y', grad_kernel, grady_thresh)
+    # get mag_sobel_threshold
+    mag_binary = mag_sobel_threshold(gray_img, mag_kernel, mag_thresh)
+    # get dir_sobel_threshold
+    dir_binary = dir_sobel_threshold(gray_img, dir_kernel, dir_thresh)
+    # Combined color channels and gradient in y and x and it directions and magnitudes (apply threshold)
     combined_binary = np.zeros_like(color_binary)
     combined_binary[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1)) | (color_binary == 1)] = 1
     
