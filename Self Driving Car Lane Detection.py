@@ -64,52 +64,33 @@ def getSrcDstPoints(img):
 def mag_sobel_threshold(img , kernel = 3, thresh = (0, 255)):
     
     # get the image in gray
-    
     gray_img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-
     # Apply sobel edge detection in x and y directions
-    
     sobelx = cv2.Sobel(gray_img, cv2.CV_64F, 1, 0, ksize = kernel)
     sobely = cv2.Sobel(gray_img, cv2.CV_64F, 0, 1, ksize = kernel)
-    
     # Get the pixels magnitude
-    
     magnitude = np.sqrt(sobelx ** 2 + sobely ** 2) 
-    
     # Rescale the intensities
-    
     scaled_magnitude = ((255 * magnitude) / np.max(magnitude)).astype(np.uint8) 
-    
     # Create binary mask
-    
     mag_binary = np.zeros_like(scaled_magnitude)
-    
     # Combine the mask with the scaled magnitude (apply threshold)
-    
     mag_binary[(scaled_magnitude >= thresh[0]) & (scaled_magnitude <= thresh[1])] = 1
-    
     return mag_binary
+
+
 
 def dir_sobel_threshold(img, kernel = 3, thresh = (0, np.pi/2)):
     
     # get the image in gray
-    
     gray_img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-
     # Calculate the x and y gradients
-    
     sobelx = cv2.Sobel(gray_img, cv2.CV_64F, 1, 0, ksize = kernel)
     sobely = cv2.Sobel(gray_img, cv2.CV_64F, 0, 1, ksize = kernel)
-    
     # Take the absolute value
     abs_dir = np.arctan2(np.absolute(sobely), np.absolute(sobelx))
-    
     # Create binary mask
-    
     dir_binary =  np.zeros_like(abs_grad_dir)
-    
     # Combine the mask with the scaled magnitude (apply threshold)
-    
     dir_binary[(abs_dir >= thresh[0]) & (abs_dir <= thresh[1])] = 1
-    
     return dir_binary
