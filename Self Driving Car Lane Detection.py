@@ -163,6 +163,7 @@ def combined_color_channels_threshod(img, r_thresh=(225,255), l_thresh=(215,255)
 
 def combined_grad_color_threshold(img,grad_kernel = 3, gradx_thresh = (20,100), grady_thresh = (50,100),mag_kernel = 5, mag_thresh = (50,100),dir_kernel = 9, dir_thresh = (0.7,1.3)):
     
+    color_binary = combined_color_channels_threshod(img)
     gray_img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
     # Apply sobel edge detection in x and y directions
     gradx = abs_sobel_thresh(img, 'x', grad_kernel, gradx_thresh)
@@ -191,3 +192,14 @@ def auto_canny_threshould(image, sigma=0.33):
     canny_edged = cv2.Canny(img_blured, lower_threshold, upper_threshold)
     # return the edged image
     return canny_edged
+
+# combine all together to get binary image with good edge detection:
+
+def combined_canny_grad_color_threshold(img):
+
+    color_grad_binary = combined_grad_color_threshold(img)
+    canny_edged = auto_canny_threshould(img)
+    combined_binary = np.zeros_like(color_grad_binary)
+    combined_binary[ (canny_edged == 1) | (color_grad_binary == 1)] = 1
+    
+    return combined_binary
