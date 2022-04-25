@@ -16,12 +16,9 @@ test11 = cv2.imread('test_samples/straight_lines1.jpg')
 def show_image(image, title = 'image', cmap_type = 'gray'):
     plt.imshow(image, cmap = cmap_type)
     plt.title(title)
-    #plt.axis("off")
     
 def gaussian_blur(img, kernel_size):
     return cv2.GaussianBlur(img,(kernel_size,kernel_size),0)
-    
-    
     
 def get_M_Minv(sourcePints, destinationPoints):
   
@@ -42,32 +39,21 @@ def warp_image(img, M):
     return warped
     
     
+def getSrcDstPoints(img):
+
+    width = img.shape[1]
+    height = img.shape[0]
+
+    src1 = (width*2/5, height*2/3)
+    src2 = (width*3/5, height*2/3)
+    src3 = (width*5/6, height)
+    src4 = (width/6, height)
+    src = np.float32([src1, src2, src3, src4])
+
+    dst1 = (320, 0)
+    dst2 = (width - 320, 0)
+    dst3 = (width - 320, height)
+    dst4 = (320, height)
+    dst = np.float32([dst1, dst2, dst3, dst4])
     
-def apply_perspective_transform(img, M, src, dst, lines_color = (0,255,0), thickness = 5):
-    """
-    #Apply the perspective transformation to a color image (test)
-    
-    Parameters:
-        img (np.array): Image
-        M (np.array(float)): Matrix that define the transformations to apply (could by M or Minv)
-        src (np.array(float)): Source points (to be draw)
-        dst (np.array(float)): Destination points (to be draw)
-        lines_color (list): Line color
-        thickness (int): Thickness of the rectangule and polygon
-        
-    Returns:
-        warped(numpy.ndarray): Image transformed
-    """         
-    warped = warp_image(img, M)
-    #cv2.rectangle(warped, (dst[0][0], dst[0][1]), (dst[2][0], dst[2][1]), lines_color, thickness)
-    
-    roi = (src.reshape((-1, 1, 2))).astype(np.int32)
-    img_roi = img.copy()
-    cv2.polylines(img_roi,[roi], True, lines_color, thickness)
-    
-    fig, axs = plt.subplots(1, 2, figsize = (16, 16))
-    axs = axs.ravel()
-    axs[0].imshow(cv2.cvtColor(img_roi, cv2.COLOR_BGR2RGB))
-    axs[0].set_title('Original ', fontsize = 12)
-    axs[1].imshow(cv2.cvtColor(warped, cv2.COLOR_BGR2RGB))   
-    axs[1].set_title('Warped (Bird eye view)', fontsize = 12)
+    return src , dst
