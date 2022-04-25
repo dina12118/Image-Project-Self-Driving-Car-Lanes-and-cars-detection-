@@ -176,3 +176,18 @@ def combined_grad_color_threshold(img,grad_kernel = 3, gradx_thresh = (20,100), 
     combined_binary[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1)) | (color_binary == 1)] = 1
     
     return combined_binary
+
+# Apply Canny Edge Detection
+def auto_canny_threshould(image, sigma=0.33):
+    
+    # Apply bluring to iliminate the noise
+    img_blured = gaussian_blur(image, 7)
+    # compute the median of the single channel pixel intensities
+    v = np.median(img_blured)
+    # apply automatic Canny edge detection using the computed median
+    lower_threshold = int(max(0, (1.0 - sigma) * v))
+    upper_threshold = int(min(255, (1.0 + sigma) * v))
+    # apply canny edge detection
+    canny_edged = cv2.Canny(img_blured, lower_threshold, upper_threshold)
+    # return the edged image
+    return canny_edged
