@@ -236,7 +236,7 @@ def get_histogram_peaks(img):
     return leftx_base, rightx_base
 
 # Apply Sliding Window Algorithm:
-def f1(warped, no_of_windows = 10, margin = 100, minpix = 20):
+def Sliding_Window_lines_positions(warped, no_of_windows = 10, margin = 100, minpix = 20):
 
     leftx_base, rightx_base = get_histogram_peaks(warped)   
     window_height = np.int(warped.shape[0]//no_of_windows)#1280//10 = 128
@@ -306,7 +306,9 @@ def f1(warped, no_of_windows = 10, margin = 100, minpix = 20):
 
     return leftx, lefty, rightx, righty
 
-def f2(warped,leftx, lefty, rightx, righty):
+
+# Get Lines and curves equations
+def Fitting_Lines_Curves_eqns(warped,leftx, lefty, rightx, righty):
     ploty = np.linspace(0, warped.shape[0]-1, warped.shape[0] )#0,1,2,......,719
     
     # np.polyfit Returns a vector of coefficients p that minimises the squared error in the order deg, deg-1, … 0.
@@ -328,7 +330,7 @@ def f2(warped,leftx, lefty, rightx, righty):
     
     return left_fit, right_fit, left_fitx, right_fitx, left_curv, right_curv
 
-def f3(warped, left_fit, right_fit, sap_margin =70):
+def Get_Exact_Lines_Positions(warped, left_fit, right_fit, sap_margin =70):
 
     # Grab activated pixels
     non_zero = warped.nonzero()
@@ -351,7 +353,7 @@ def f3(warped, left_fit, right_fit, sap_margin =70):
     
     return leftx_line_pos, lefty_line_pos, rightx_line_pos, righty_line_pos
 
-def f4(img, Minv, left_fitx, right_fitx):
+def Draw_Lines_on_img(img, Minv, left_fitx, right_fitx):
 
     ploty = np.linspace(0, img.shape[0]-1, img.shape[0] )
     height, width = img.shape[:2]
@@ -374,7 +376,7 @@ def f4(img, Minv, left_fitx, right_fitx):
     return img_with_lane, warp_color
 
 
-def f5(img, leftx_base, rightx_base ,left_curv, right_curv):
+def Write_Information_on_img(img, leftx_base, rightx_base ,left_curv, right_curv):
 
     copy_img = np.copy(img)
     h = copy_img.shape[0]
@@ -400,20 +402,20 @@ def Main_pipeline(img):
     M , Minv = get_M_Minv(src, dst)
     warped  = get_binary_warped(img, M)
     leftx_base, rightx_base = get_histogram_peaks(warped)
-    leftx, lefty, rightx, righty = f1(warped, no_of_windows = 10, margin = 100, minpix = 20)
-    left_fit, right_fit, left_fitx, right_fitx, left_curv, right_curv = f2(warped,leftx, lefty, rightx, righty)
-    leftx2, lefty2, rightx2, righty2 = f3(warped, left_fit, right_fit)
-    left_fit2, right_fit2, left_fitx2, right_fitx2, left_curv2, right_curv2 = f2(warped,leftx, lefty, rightx, righty)
+    leftx, lefty, rightx, righty = Sliding_Window_lines_positions(warped, no_of_windows = 10, margin = 100, minpix = 20)
+    left_fit, right_fit, left_fitx, right_fitx, left_curv, right_curv = Fitting_Lines_Curves_eqns(warped,leftx, lefty, rightx, righty)
+    leftx2, lefty2, rightx2, righty2 = Get_Exact_Lines_Positions(warped, left_fit, right_fit)
+    left_fit2, right_fit2, left_fitx2, right_fitx2, left_curv2, right_curv2 = Fitting_Lines_Curves_eqns(warped,leftx, lefty, rightx, righty)
 
-    img2,img3 = f4(img, Minv, left_fitx2, right_fitx2)
-    img2 = f5(img2, leftx_base, rightx_base,left_curv2, right_curv2)
+    img2,img3 = Draw_Lines_on_img(img, Minv, left_fitx2, right_fitx2)
+    img2 = Write_Information_on_img(img2, leftx_base, rightx_base,left_curv2, right_curv2)
         
     #plt.imshow(img2)
 
     return img2
 
 
-    
+# Showing the colored warped image with lines detecting before transfer it to its original perspictive   
 def binary_warped_pipeline(img):
     image_height = img.shape[0]
     image_width = img.shape[1]
@@ -433,7 +435,7 @@ def binary_warped_pipeline(img):
     return np.moveaxis(img2, 0, -1)
 
 
-
+# Showing the image after applying thresolding on it
 def threshold_pipeline(img):
     image_height = img.shape[0]
     image_width = img.shape[1]
@@ -451,7 +453,7 @@ def threshold_pipeline(img):
     return np.moveaxis(img2, 0, -1)
 
 
-
+# Showing the warped image after applying thresolding on it
 def drawn_warped_pipeline(img):
     image_height = img.shape[0]
     image_width = img.shape[1]
@@ -460,16 +462,16 @@ def drawn_warped_pipeline(img):
     warped2 = warp_image(img,M)
     warped  = get_binary_warped(img, M)
     leftx_base, rightx_base = get_histogram_peaks(warped)
-    leftx, lefty, rightx, righty = f1(warped, no_of_windows = 10, margin = 100, minpix = 20)
-    left_fit, right_fit, left_fitx, right_fitx, left_curv, right_curv = f2(warped,leftx, lefty, rightx, righty)
-    leftx2, lefty2, rightx2, righty2 = f3(warped, left_fit, right_fit)
-    left_fit2, right_fit2, left_fitx2, right_fitx2, left_curv2, right_curv2 = f2(warped,leftx, lefty, rightx, righty)
+    leftx, lefty, rightx, righty = Sliding_Window_lines_positions(warped, no_of_windows = 10, margin = 100, minpix = 20)
+    left_fit, right_fit, left_fitx, right_fitx, left_curv, right_curv = Fitting_Lines_Curves_eqns(warped,leftx, lefty, rightx, righty)
+    leftx2, lefty2, rightx2, righty2 = Get_Exact_Lines_Positions(warped, left_fit, right_fit)
+    left_fit2, right_fit2, left_fitx2, right_fitx2, left_curv2, right_curv2 = Fitting_Lines_Curves_eqns(warped,leftx, lefty, rightx, righty)
 
-    img2,out = f4(img, Minv, left_fitx2, right_fitx2)
+    img2,out = Draw_Lines_on_img(img, Minv, left_fitx2, right_fitx2)
     out2 = cv2.addWeighted(warped2, 1, out, 0.8, 0)
     return out2
 
-
+# Showing the result and the pipeline stages together in one image (Debugging)
 def debug_img_pipeline(img):
     img1 = Image.fromarray(Main_pipeline(img).astype(np.uint8), 'RGB')
     img2 = Image.fromarray(drawn_warped_pipeline(img).astype(np.uint8), 'RGB') 
@@ -484,14 +486,25 @@ def debug_img_pipeline(img):
     image.paste(img2,(int(size[0]),0))
     image.paste(img3,(int(size[0]),int(size[1]/3)))
     image.paste(img4,(int(size[0]),2*int(size[1]/3)))
-    
-    
-   
     image_array = np.asarray(image)
-    
     return image_array
 
+
+# Function saves the result image
+def Create_img_lane_lines(input_path,output_path,debug = 0):
+    img = plt.imread(input_path)
+    if(debug == 1):
+        new_img = debug_img_pipeline(img)
+    else:
+        new_img = Main_pipeline(img)
+        
+    #cv2.imwrite(output_path,new_img)
+    new_img = Image.fromarray(new_img.astype(np.uint8), 'RGB')
+    new_img.save(output_path)
+
     
+    
+# Function saves the result video
 def Create_Video(input_path, output_path,debug=0, subclip = False, subtime = 0):
    if (debug==0):
        video_input = VideoFileClip(input_path)
