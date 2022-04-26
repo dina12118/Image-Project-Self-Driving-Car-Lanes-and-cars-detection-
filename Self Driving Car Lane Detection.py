@@ -495,7 +495,7 @@ def Create_Video2(input_path, subclip = False, subtime = 0): #should have array 
     processed_video3 = video_input.fl_image(threshold_pipeline)
     %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video3.mp4', audio=False)
     
-    processed_video = video_input.fl_image(drawn_warped)
+    processed_video = video_input.fl_image(binary_warped_pipeline)
     %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video4.mp4', audio=False)
     
     #%time processed_video.write_videofile(output_path, audio=False)
