@@ -3,6 +3,7 @@ import glob
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
 %matplotlib inline
 
 #upload test photo
@@ -412,16 +413,6 @@ def Main_pipeline(img):
     return img2
 
 
-def Create_Video(input_path,output_path, subclip = False, subtime = 0):
-    
-    video_input = VideoFileClip(input_path)
-    if(subclip == True):
-        newclip = video_input.subclip(0,subtime)
-        processed_video = newclip.fl_image(Main_pipeline)
-    else:
-        processed_video = video_input.fl_image(Main_pipeline)
-    %time processed_video.write_videofile(output_path, audio=False)
-
     
 def binary_warped_pipeline(img):
     image_height = img.shape[0]
@@ -478,8 +469,6 @@ def drawn_warped_pipeline(img):
     out2 = cv2.addWeighted(warped2, 1, out, 0.8, 0)
     return out2
 
-from PIL import Image
-import numpy as np
 
 def debug_img_pipeline(img):
     img1 = Image.fromarray(Main_pipeline(img).astype(np.uint8), 'RGB')
@@ -503,7 +492,7 @@ def debug_img_pipeline(img):
     return image_array
 
     
-def Create_Video2(input_path, output_path, subclip = False, subtime = 0,debug=0): #should have array of output paths
+def Create_Video(input_path, output_path,debug=0, subclip = False, subtime = 0):
    if (debug==0):
        video_input = VideoFileClip(input_path)
        if(subclip == True):
