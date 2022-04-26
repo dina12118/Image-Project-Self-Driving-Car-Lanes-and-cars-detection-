@@ -237,7 +237,8 @@ def get_histogram_peaks(img):
 
 # Apply Sliding Window Algorithm:
 def Sliding_Window_lines_positions(warped, no_of_windows = 10, margin = 100, minpix = 20):
-
+    # this algorithm return list of pixels that can be used to fit a polinomio that correspond with the lines (left and rigth)
+    # this method is used only at the beginning or if the tracking systema lost the lane lines.
     leftx_base, rightx_base = get_histogram_peaks(warped)   
     window_height = np.int(warped.shape[0]//no_of_windows)#1280//10 = 128
     # nonzero() Returns a tuple of arrays, for x and y, containing the indices of the non-zero elements
