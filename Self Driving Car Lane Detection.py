@@ -479,23 +479,27 @@ def drawn_warped_pipeline(img):
     return out2
 
 
-def Create_Video2(input_path, subclip = False, subtime = 0): #should have array of output paths
+def Create_Video2(input_path, output_path, subclip = False, subtime = 0): #should have array of output paths
     
-    video_input = VideoFileClip(input_path)
+    video_input = VideoFileClip(input_path).subclip(0, 5)
     #if(subclip == True):
         #newclip = video_input.subclip(0,subtime)
         #processed_video = newclip.fl_image(drawn_warped)
     #else:
     processed_video1 = video_input.fl_image(Main_pipeline)
-    %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video1.mp4', audio=False)
+    #%time processed_video1.write_videofile('C:\Users\User\Image_project\project_video1.mp4', audio=False)
 
     processed_video2 = video_input.fl_image(drawn_warped_pipeline)
-    %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video2.mp4', audio=False)
+    #%time processed_video1.write_videofile('C:\Users\User\Image_project\project_video2.mp4', audio=False)
 
     processed_video3 = video_input.fl_image(threshold_pipeline)
-    %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video3.mp4', audio=False)
+    #%time processed_video1.write_videofile('C:\Users\User\Image_project\project_video3.mp4', audio=False)
     
     processed_video = video_input.fl_image(binary_warped_pipeline)
-    %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video4.mp4', audio=False)
+    #%time processed_video1.write_videofile('C:\Users\User\Image_project\project_video4.mp4', audio=False)
     
     #%time processed_video.write_videofile(output_path, audio=False)
+    clips = [[processed_video1, processed_video2],
+            [processed_video3, processed_video]]
+    final = clips_array(clips)
+    %time final.write_videofile(output_path, audio=False)
