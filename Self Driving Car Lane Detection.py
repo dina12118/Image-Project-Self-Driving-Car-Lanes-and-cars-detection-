@@ -478,28 +478,48 @@ def drawn_warped_pipeline(img):
     out2 = cv2.addWeighted(warped2, 1, out, 0.8, 0)
     return out2
 
+from PIL import Image
+import numpy as np
 
-def Create_Video2(input_path, output_path, subclip = False, subtime = 0): #should have array of output paths
+def debug_img_pipeline(img):
+    img1 = Image.fromarray(Main_pipeline(img).astype(np.uint8), 'RGB')
+    img2 = Image.fromarray(drawn_warped_pipeline(img).astype(np.uint8), 'RGB') 
+    img3 = Image.fromarray(threshold_pipeline(img).astype(np.uint8),'RGB') 
+    img4 = Image.fromarray(binary_warped_pipeline(img).astype(np.uint8),'RGB') 
+    size=img1.size
+    img2=img2.resize((int(size[0]/3),int(size[1]*0.333)))
+    img3=img3.resize((int(size[0]/3),int(size[1]*0.333)))
+    img4=img4.resize((int(size[0]/3),int(size[1]*0.333)))
+    image = Image.new('RGB',(int((4/3)*size[0]),int(size[1])), (255,255,255))
+    image.paste(img1,(0,0))
+    image.paste(img2,(int(size[0]),0))
+    image.paste(img3,(int(size[0]),int(size[1]/3)))
+    image.paste(img4,(int(size[0]),2*int(size[1]/3)))
     
-    video_input = VideoFileClip(input_path).subclip(0, 5)
-    #if(subclip == True):
-        #newclip = video_input.subclip(0,subtime)
-        #processed_video = newclip.fl_image(drawn_warped)
-    #else:
-    processed_video1 = video_input.fl_image(Main_pipeline)
-    #%time processed_video1.write_videofile('C:\Users\User\Image_project\project_video1.mp4', audio=False)
+    
+   
+    image_array = np.asarray(image)
+    
+    return image_array
 
-    processed_video2 = video_input.fl_image(drawn_warped_pipeline)
-    #%time processed_video1.write_videofile('C:\Users\User\Image_project\project_video2.mp4', audio=False)
-
-    processed_video3 = video_input.fl_image(threshold_pipeline)
-    #%time processed_video1.write_videofile('C:\Users\User\Image_project\project_video3.mp4', audio=False)
     
-    processed_video = video_input.fl_image(binary_warped_pipeline)
-    #%time processed_video1.write_videofile('C:\Users\User\Image_project\project_video4.mp4', audio=False)
+def Create_Video2(input_path, output_path, subclip = False, subtime = 0,debug=0): #should have array of output paths
+   if (debug==0):
+       video_input = VideoFileClip(input_path)
+       if(subclip == True):
+            newclip = video_input.subclip(0,subtime)
+            processed_video = newclip.fl_image(Main_pipeline)
+       else:
+            processed_video = video_input.fl_image(Main_pipeline)
+   
+       %time  processed_video.write_videofile(output_path, audio=False)
+   elif(debug==1) :
+       video_input = VideoFileClip(input_path)
+       if(subclip == True):
+           newclip = video_input.subclip(0,subtime)
+           processed_video = newclip.fl_image(debug_img_pipeline)
+       else:
+           processed_video = video_input.fl_image(debug_img_pipeline)
+   %time  processed_video.write_videofile(output_path, audio=False)
     
-    #%time processed_video.write_videofile(output_path, audio=False)
-    clips = [[processed_video1, processed_video2],
-            [processed_video3, processed_video]]
-    final = clips_array(clips)
-    %time final.write_videofile(output_path, audio=False)
+    
