@@ -370,7 +370,7 @@ def f4(img, Minv, left_fitx, right_fitx):
     # Merge the lane with the original picture
     img_with_lane = cv2.addWeighted(img, 1, unWarpLane, 0.8, 0)
     
-    return img_with_lane
+    return img_with_lane, warp_color
 
 
 def f5(img, leftx_base, rightx_base ,left_curv, right_curv):
@@ -392,3 +392,110 @@ def f5(img, leftx_base, rightx_base ,left_curv, right_curv):
     cv2.putText(copy_img, text, (40,120), font, 1, (255,5255,255), 2, cv2.LINE_AA)
     
     return copy_img
+
+
+def Main_pipeline(img):
+    src , dst = getSrcDstPoints(img)
+    M , Minv = get_M_Minv(src, dst)
+    warped  = get_binary_warped(img, M)
+    leftx_base, rightx_base = get_histogram_peaks(warped)
+    leftx, lefty, rightx, righty = f1(warped, no_of_windows = 10, margin = 100, minpix = 20)
+    left_fit, right_fit, left_fitx, right_fitx, left_curv, right_curv = f2(warped,leftx, lefty, rightx, righty)
+    leftx2, lefty2, rightx2, righty2 = f3(warped, left_fit, right_fit)
+    left_fit2, right_fit2, left_fitx2, right_fitx2, left_curv2, right_curv2 = f2(warped,leftx, lefty, rightx, righty)
+
+    img2,img3 = f4(img, Minv, left_fitx2, right_fitx2)
+    img2 = f5(img2, leftx_base, rightx_base,left_curv2, right_curv2)
+        
+    #plt.imshow(img2)
+
+    return img2
+
+
+def Create_Video(input_path,output_path, subclip = False, subtime = 0):
+    
+    video_input = VideoFileClip(input_path)
+    if(subclip == True):
+        newclip = video_input.subclip(0,subtime)
+        processed_video = newclip.fl_image(Main_pipeline)
+    else:
+        processed_video = video_input.fl_image(Main_pipeline)
+    %time processed_video.write_videofile(output_path, audio=False)
+
+    
+def binary_warped_pipeline(img):
+    image_height = img.shape[0]
+    image_width = img.shape[1]
+    src , dst = getSrcDstPoints(img)
+    M , Minv = get_M_Minv(src, dst)
+    out = get_binary_warped(img, M)
+    img = np.zeros((3, image_height, image_width))
+    img[0] = out
+    img[1] = out
+    img[2] = out
+    nn = np.moveaxis(img, 0, -1)
+    out2 = cv2.cvtColor(nn.astype('uint8') * 255, cv2.COLOR_BGR2GRAY)
+    img2 = np.zeros((3, image_height, image_width))
+    img2[0] = out2
+    img2[1] = out2
+    img2[2] = out2
+    return np.moveaxis(img2, 0, -1)
+
+
+
+def threshold_pipeline(img):
+    image_height = img.shape[0]
+    image_width = img.shape[1]
+    out = combined_canny_grad_color_threshold(img)
+    img = np.zeros((3, image_height, image_width))
+    img[0] = out
+    img[1] = out
+    img[2] = out
+    nn = np.moveaxis(img, 0, -1)
+    out2 = cv2.cvtColor(nn.astype('uint8') * 255, cv2.COLOR_BGR2GRAY)
+    img2 = np.zeros((3, image_height, image_width))
+    img2[0] = out2
+    img2[1] = out2
+    img2[2] = out2
+    return np.moveaxis(img2, 0, -1)
+
+
+
+def drawn_warped_pipeline(img):
+    image_height = img.shape[0]
+    image_width = img.shape[1]
+    src , dst = getSrcDstPoints(img)
+    M , Minv = get_M_Minv(src, dst)
+    warped2 = warp_image(img,M)
+    warped  = get_binary_warped(img, M)
+    leftx_base, rightx_base = get_histogram_peaks(warped)
+    leftx, lefty, rightx, righty = f1(warped, no_of_windows = 10, margin = 100, minpix = 20)
+    left_fit, right_fit, left_fitx, right_fitx, left_curv, right_curv = f2(warped,leftx, lefty, rightx, righty)
+    leftx2, lefty2, rightx2, righty2 = f3(warped, left_fit, right_fit)
+    left_fit2, right_fit2, left_fitx2, right_fitx2, left_curv2, right_curv2 = f2(warped,leftx, lefty, rightx, righty)
+
+    img2,out = f4(img, Minv, left_fitx2, right_fitx2)
+    out2 = cv2.addWeighted(warped2, 1, out, 0.8, 0)
+    return out2
+
+
+def Create_Video2(input_path, subclip = False, subtime = 0): #should have array of output paths
+    
+    video_input = VideoFileClip(input_path)
+    #if(subclip == True):
+        #newclip = video_input.subclip(0,subtime)
+        #processed_video = newclip.fl_image(drawn_warped)
+    #else:
+    processed_video1 = video_input.fl_image(Main_pipeline)
+    %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video1.mp4', audio=False)
+
+    processed_video2 = video_input.fl_image(drawn_warped_pipeline)
+    %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video2.mp4', audio=False)
+
+    processed_video3 = video_input.fl_image(threshold_pipeline)
+    %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video3.mp4', audio=False)
+    
+    processed_video = video_input.fl_image(drawn_warped)
+    %time processed_video1.write_videofile('C:\Users\User\Image_project\project_video4.mp4', audio=False)
+    
+    #%time processed_video.write_videofile(output_path, audio=False)
