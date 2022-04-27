@@ -17,6 +17,6 @@ video from a front-facing camera on a car.
 - Warp the detected lane boundaries back onto the original image.
 - Output image/video with lane well detected
 
-### Steps have been described correctly in the project notebook
+### Steps have been described correctly in the project notebook `Self_Driving_Car_Lane_Lines_Detection.ipynb`
 
 > Note: for running this project in anaconda cmd you must download both `self_car.ipynb` and `test_car.py` files in the same directory, specify the directory in your cmd and then call `python test_car.py path_in path_out --type 0 --debug 1 --subclip True --subtime 3` for example if you want to show debugging mode and subclib is for gettin short video to reduce the processing time and its default value is 'False' with zero subtime and the type attribute 0 for video and 1 for image.
