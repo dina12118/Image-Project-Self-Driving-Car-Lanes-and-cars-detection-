@@ -3,6 +3,10 @@
 in this project our goal is to write software pipeline that identify the lane boundaries in a
 video from a front-facing camera on a car.
 
+## This Project is done by:
+- Zyad Hassan Hosney 1806090
+- Dina Ibrahim Elkady 18Q3800
+
 
 ## Steps of this project are the following:
 
@@ -12,3 +16,7 @@ video from a front-facing camera on a car.
 - Determine the curvature of the lane and vehicle position with respect to center.
 - Warp the detected lane boundaries back onto the original image.
 - Output image/video with lane well detected
+
+### Steps have been described correctly in the project notebook
+
+Note: for running this project in anaconda cmd you must download both 'self_car.ipynb' and 'test_car.py' files in the same directory, specify the directory in your cmd and then call 'python test_car.py path_in path_out --debug 1 --subclip True --subtime 3' for example if you want to show debugging mode and subcli is for gettin short video to reduce the processing time and its default value is 'False' with zero subtime.
