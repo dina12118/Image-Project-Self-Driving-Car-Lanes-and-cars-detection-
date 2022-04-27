@@ -525,4 +525,24 @@ def Create_Video(input_path, output_path,debug=0, subclip = False, subtime = 0):
            processed_video = video_input.fl_image(debug_img_pipeline)
    %time  processed_video.write_videofile(output_path, audio=False)
     
-    
+import sys,os,argparse
+from IPython.display import HTML
+CONFIG_FILE = '.config_ipynb'
+if os.path.isfile(CONFIG_FILE):
+    with open(CONFIG_FILE) as f:
+        sys.argv = f.read().split()
+else:
+    sys.argv = ['test_car.py', 'input_path','output_path','--type','--debug',"--subclip","--subtime"]
+
+parser = argparse.ArgumentParser()
+parser.add_argument("input_path",help="Input path of video ")
+parser.add_argument("output_path",help="output path of video ")
+parser.add_argument("--type", type=bool, default=0, help=" 1 for image , 0 for video ")
+parser.add_argument("--debug", type=int, default=0, help=" 1 for debugging mode , 0 for the normal mode ")
+parser.add_argument("--subclip", type=bool, default=False, help="true for just make subclip of video ")
+parser.add_argument("--subtime", type=int, default=0, help="Time in seconds of the subclip ")
+args = parser.parse_args()
+if (args.type==0):
+    Create_Video(args.input_path,args.output_path,args.debug,args.subclip,args.subtime)
+elif (args.type==1):
+    Create_img_lane_lines(args.input_path,args.output_path,args.debug)
