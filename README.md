@@ -19,4 +19,4 @@ video from a front-facing camera on a car.
 
 ### Steps have been described correctly in the project notebook
 
->Note: for running this project in anaconda cmd you must download both 'self_car.ipynb' and 'test_car.py' files in the same directory, specify the directory in your cmd and then call 'python test_car.py path_in path_out --debug 1 --subclip True --subtime 3' for example if you want to show debugging mode and subcli is for gettin short video to reduce the processing time and its default value is 'False' with zero subtime.
+> Note: for running this project in anaconda cmd you must download both 'self_car.ipynb' and 'test_car.py' files in the same directory, specify the directory in your cmd and then call 'python test_car.py path_in path_out --debug 1 --subclip True --subtime 3' for example if you want to show debugging mode and subcli is for gettin short video to reduce the processing time and its default value is 'False' with zero subtime.
