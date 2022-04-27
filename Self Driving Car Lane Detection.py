@@ -537,7 +537,7 @@ else:
 parser = argparse.ArgumentParser()
 parser.add_argument("input_path",help="Input path of video ")
 parser.add_argument("output_path",help="output path of video ")
-parser.add_argument("--type", type=bool, default=0, help=" 1 for image , 0 for video ")
+parser.add_argument("--type", type=int, default=0, help=" 1 for image , 0 for video ")
 parser.add_argument("--debug", type=int, default=0, help=" 1 for debugging mode , 0 for the normal mode ")
 parser.add_argument("--subclip", type=bool, default=False, help="true for just make subclip of video ")
 parser.add_argument("--subtime", type=int, default=0, help="Time in seconds of the subclip ")
