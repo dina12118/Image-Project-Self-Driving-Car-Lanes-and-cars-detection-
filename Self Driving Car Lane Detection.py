@@ -507,23 +507,24 @@ def Create_img_lane_lines(input_path,output_path,debug = 0):
     
 # Function saves the result video
 def Create_Video(input_path, output_path,debug=0, subclip = False, subtime = 0):
-   if (debug==0):
-       video_input = VideoFileClip(input_path)
-       if(subclip == True):
+    if (debug==0):
+        video_input = VideoFileClip(input_path)
+        if(subclip == True):
             newclip = video_input.subclip(0,subtime)
             processed_video = newclip.fl_image(Main_pipeline)
-       else:
+        else:
             processed_video = video_input.fl_image(Main_pipeline)
    
-       %time  processed_video.write_videofile(output_path, audio=False)
-   elif(debug==1) :
-       video_input = VideoFileClip(input_path)
-       if(subclip == True):
-           newclip = video_input.subclip(0,subtime)
-           processed_video = newclip.fl_image(debug_img_pipeline)
-       else:
-           processed_video = video_input.fl_image(debug_img_pipeline)
-       %time  processed_video.write_videofile(output_path, audio=False)
+        %time  processed_video.write_videofile(output_path, audio=False)
+    elif(debug==1) :
+        video_input = VideoFileClip(input_path)
+        if(subclip == True):
+            newclip = video_input.subclip(0,subtime)
+            processed_video = newclip.fl_image(debug_img_pipeline)
+        else:
+            processed_video = video_input.fl_image(debug_img_pipeline)
+            
+        %time  processed_video.write_videofile(output_path, audio=False)
     
 import sys,os,argparse
 from IPython.display import HTML
