@@ -19,7 +19,10 @@ video from a front-facing camera on a car.
 - Warp the detected lane boundaries back onto the original image.
 - Output image/video with lane well detected
 
-![image](https://user-images.githubusercontent.com/85132939/170764229-59dc5f0d-c193-4ccc-80c6-1e258298c699.png)
+
+
+https://user-images.githubusercontent.com/85132939/170764581-790ca035-b528-4eca-92bb-98674f935976.mp4
+
 
 ### Phase 2
 
