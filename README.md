@@ -18,11 +18,15 @@ video from a front-facing camera on a car.
 - Determine the curvature of the lane and vehicle position with respect to center.
 - Warp the detected lane boundaries back onto the original image.
 - Output image/video with lane well detected
-![image](https://user-images.githubusercontent.com/85132939/170764173-31e3856f-6336-4a51-af07-9865fb2d6950.png)
+
+![image](https://user-images.githubusercontent.com/85132939/170764229-59dc5f0d-c193-4ccc-80c6-1e258298c699.png)
 
 ### Phase 2
 
 - Apply yolo v3 algorithm
+
+
+![image](https://user-images.githubusercontent.com/85132939/170764401-075921f1-d2bf-48b2-bd1f-42cbe3eccda1.png)
 
 ### Steps have been described correctly in the project notebooks `Self_Driving_Car_Lane_Lines_Detection.ipynb` and `Phase 2 Pipeline.ipynb`
 
