@@ -23,7 +23,7 @@ video from a front-facing camera on a car.
 
 - Apply yolo v3 algorithm
 
-### Steps have been described correctly in the project notebooks `Self_Driving_Car_Lane_Lines_Detection.ipynb` and 'Phase 2 Pipeline.ipynb'
+### Steps have been described correctly in the project notebooks `Self_Driving_Car_Lane_Lines_Detection.ipynb` and `Phase 2 Pipeline.ipynb`
 
 > Note: for running Project Phase 1 in Anaconda Prompt you must download both `self_car.ipynb` and `test_car.py` files in the same directory, specify the directory in your cmd and then call `python test_car.py path_in path_out --type 0 --debug 1 --subclip True --subtime 3` for example if you want to show debugging mode and subclib is for gettin short video to reduce the processing time and its default value is 'False' with zero subtime and the type attribute 0 for video and 1 for image.
 
